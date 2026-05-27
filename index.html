@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>倒數計時器 雲端免安裝版</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Load Client-side MQTT client & QR Generator via highly reliable CDNs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/4.3.7/mqtt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
+</head>
+<body>
+
+    <!-- SECTION 1: LOBBY ENTRANCE -->
+    <div id="lobby-screen" class="screen active">
+        <header class="lobby-header">
+            <h1>倒數計時</h1>
+            <p>雲端免安裝 P2P 即時同步計時器</p>
+        </header>
+
+        <div class="lobby-cards-container">
+            <!-- Mode 1: Display -->
+            <div class="lobby-card" id="btn-select-display">
+                <div class="card-icon">🖥️</div>
+                <h2>大螢幕顯示模式</h2>
+                <p>適合 Chromebook、平板或電視。在大螢幕上展示滿版超大字體倒數，並顯示連線 QR Code，供手機掃碼遠端設定與操控。</p>
+            </div>
+
+            <!-- Mode 2: Controller -->
+            <div class="lobby-card" id="btn-select-controller">
+                <div class="card-icon">📱</div>
+                <h2>手機遙控模式</h2>
+                <p>將手機變身為專屬遙控器。配對成功後，可無線控制大螢幕的倒數時間、播放狀態、背景漸層、數字顏色與字型風格。</p>
+            </div>
+        </div>
+
+        <footer class="lobby-footer">
+            一個人類、GEMINI CLI 與 Antigravity 聯合製作
+        </footer>
+    </div>
+
+    <!-- SECTION 2: DISPLAY SCREEN (CHROMEBOOK / TABLET) -->
+    <div id="display-screen" class="screen">
+        <!-- Huge Countdown Digits -->
+        <div id="display-timer-text" class="timer-digits">05:00</div>
+
+        <!-- Quick Controls (Bottom Bar, Toggles Hover) -->
+        <div class="display-controls-bar">
+            <button id="btn-disp-play" class="btn-icon" title="啟動/暫停">▶</button>
+            <button id="btn-disp-reset" class="btn-icon" title="重設">↺</button>
+            <button id="btn-disp-qr" class="btn-icon" title="顯示/隱藏 連線資訊">⚙️</button>
+            <button id="btn-disp-fullscreen" class="btn-icon" title="全螢幕">⛶</button>
+            <button id="btn-disp-lobby" class="btn-icon" title="返回首頁">🏠</button>
+        </div>
+
+        <!-- Glassmorphism QR Connection Panel -->
+        <div id="connection-card" class="glass-card active">
+            <div class="card-header">
+                <h3>📱 手機掃碼遠端控制</h3>
+                <button id="btn-close-connection" class="btn-close">×</button>
+            </div>
+            
+            <div class="qr-container">
+                <canvas id="qr-canvas"></canvas>
+            </div>
+
+            <div id="connection-url" class="connection-url">載入網址中...</div>
+            
+            <p class="instructions">
+                請讓您的手機連線至網際網路，掃描上方 QR Code，即可隨時隨地開啟手機遙控器同步操控。
+            </p>
+        </div>
+    </div>
+
+    <!-- SECTION 3: CONTROLLER SCREEN (MOBILE PHONE) -->
+    <div id="controller-screen" class="screen">
+        <header class="controller-header">
+            <h2>倒數計時 遙控面板</h2>
+            <button id="btn-ctrl-lobby" class="btn-lobby-back">🏠 返回</button>
+        </header>
+
+        <div class="controller-content">
+            <!-- Sync Display Card -->
+            <div class="card timer-preview-card">
+                <div id="ctrl-timer-text" class="timer-preview-val">05:00</div>
+                <div class="badge" id="ctrl-state-badge">未連線</div>
+            </div>
+
+            <!-- General Controls -->
+            <div class="card">
+                <h4 class="card-title">狀態控制</h4>
+                <div class="control-row">
+                    <button id="btn-ctrl-play" class="btn-primary">啟動</button>
+                    <button id="btn-ctrl-reset" class="btn-secondary">重設</button>
+                </div>
+                <div class="control-row" style="margin-top: 10px;">
+                    <button id="btn-ctrl-sub1" class="btn-text-ctrl">- 1 分鐘</button>
+                    <button id="btn-ctrl-add1" class="btn-text-ctrl">+ 1 分鐘</button>
+                </div>
+            </div>
+
+            <!-- Presets & Picker -->
+            <div class="card">
+                <h4 class="card-title">設定時間</h4>
+                
+                <div class="presets-grid">
+                    <button class="btn-preset" data-seconds="60">1分</button>
+                    <button class="btn-preset" data-seconds="180">3分</button>
+                    <button class="btn-preset" data-seconds="300">5分</button>
+                    <button class="btn-preset" data-seconds="600">10分</button>
+                </div>
+                <div class="presets-grid" style="margin-top: 8px;">
+                    <button class="btn-preset" data-seconds="1200">20分</button>
+                    <button class="btn-preset" data-seconds="1800">30分</button>
+                    <button class="btn-preset" data-seconds="3600">1小時</button>
+                    <button class="btn-preset" data-seconds="7200">2小時</button>
+                </div>
+
+                <div class="custom-picker-row">
+                    <select id="pick-min" class="picker-select"></select>
+                    <span class="picker-unit">分</span>
+                    <select id="pick-sec" class="picker-select"></select>
+                    <span class="picker-unit">秒</span>
+                    <button id="btn-apply-custom" class="btn-apply">套用</button>
+                </div>
+            </div>
+
+            <!-- Background Styles -->
+            <div class="card">
+                <h4 class="card-title">更換背景樣式</h4>
+                <div class="style-grid bg-selector-grid">
+                    <button class="style-item bg-sunset" data-bg="sunset">夕陽漸層</button>
+                    <button class="style-item bg-aurora" data-bg="aurora">極光漸層</button>
+                    <button class="style-item bg-cyberpunk" data-bg="cyberpunk">霓虹賽博</button>
+                    <button class="style-item bg-space" data-bg="space">星空墨藍</button>
+                    <button class="style-item bg-dark" data-bg="dark" style="grid-column: span 2;">曜石極黑</button>
+                </div>
+            </div>
+
+            <!-- Digit Colors -->
+            <div class="card">
+                <h4 class="card-title">更改數字顏色</h4>
+                <div class="color-grid">
+                    <button class="color-dot color-amber" data-color="neon_amber" title="琥珀黃"></button>
+                    <button class="color-dot color-pink" data-color="neon_pink" title="霓虹粉"></button>
+                    <button class="color-dot color-blue" data-color="neon_blue" title="電光藍"></button>
+                    <button class="color-dot color-green" data-color="neon_green" title="螢光綠"></button>
+                    <button class="color-dot color-white" data-color="white" title="經典白"></button>
+                </div>
+            </div>
+
+            <!-- Fonts -->
+            <div class="card">
+                <h4 class="card-title">更換字型</h4>
+                <div class="font-column">
+                    <button class="font-item font-digital" data-font="digital">DIGITAL 數位電子</button>
+                    <button class="font-item font-serif" data-font="serif">SERIF 典雅襯線</button>
+                    <button class="font-item font-sans" data-font="sans">SANS 幾何現代</button>
+                </div>
+            </div>
+        </div>
+
+        <footer class="controller-footer">
+            一個人類、GEMINI CLI 與 Antigravity 聯合製作
+        </footer>
+    </div>
+
+    <!-- Web Audio Beep sound generator when finished -->
+    <script>
+        window.playBeep = function() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                let count = 0;
+                
+                function beep() {
+                    if (count >= 3) return;
+                    
+                    const osc = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    
+                    osc.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(880, audioCtx.currentTime); // A5 note
+                    
+                    gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                    
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.4);
+                    
+                    count++;
+                    setTimeout(beep, 600);
+                }
+                
+                beep();
+            } catch (e) {
+                console.error("Audio Context beep failed", e);
+            }
+        };
+    </script>
+
+    <!-- Client application controller -->
+    <script src="app.js"></script>
+</body>
+</html>
