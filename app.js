@@ -12,7 +12,7 @@ let timerState = {
     totalTime: 300,
     isRunning: false,
     bg: "dark",
-    digitColor: "neon_blue",
+    digitColor: "white", // Default to white
     font: "sans"
 };
 
@@ -274,11 +274,17 @@ function renderUI() {
         const timerText = document.getElementById('display-timer-text');
         timerText.textContent = formatted;
         
-        // Background style
-        document.getElementById('display-screen').className = `screen active screen-bg-${timerState.bg}`;
+        // Background style is strictly unified to black in CSS, but class keeps Display active
+        document.getElementById('display-screen').className = `screen active screen-bg-dark`;
 
-        // Font and Color style
-        timerText.className = `timer-digits digits-${timerState.font} digits-${timerState.digitColor}`;
+        // Font and dynamic Color mapping based on remaining time
+        let colorClass = `digits-${timerState.digitColor}`;
+        if (timerState.timeLeft <= 10) {
+            colorClass = 'digits-flash-red';
+        } else if (timerState.timeLeft <= 60) {
+            colorClass = 'digits-red';
+        }
+        timerText.className = `timer-digits digits-${timerState.font} ${colorClass}`;
 
         // Bottom Bar play button
         document.getElementById('btn-disp-play').textContent = timerState.isRunning ? '⏸' : '▶';
@@ -286,7 +292,17 @@ function renderUI() {
 
     // 2. CONTROLLER SCREEN
     if (currentScreen === 'controller') {
-        document.getElementById('ctrl-timer-text').textContent = formatted;
+        const ctrlTimerText = document.getElementById('ctrl-timer-text');
+        ctrlTimerText.textContent = formatted;
+        
+        // Sync preview color warning in real-time with Display
+        let ctrlColorClass = `digits-${timerState.digitColor}`;
+        if (timerState.timeLeft <= 10) {
+            ctrlColorClass = 'digits-flash-red';
+        } else if (timerState.timeLeft <= 60) {
+            ctrlColorClass = 'digits-red';
+        }
+        ctrlTimerText.className = `timer-preview-val digits-${timerState.font} ${ctrlColorClass}`;
 
         // Status badge
         const badge = document.getElementById('ctrl-state-badge');
@@ -308,14 +324,7 @@ function renderUI() {
             playBtn.className = 'btn-primary';
         }
 
-        // Sync Active Styles
-        document.querySelectorAll('.bg-selector-grid .style-item').forEach(btn => {
-            if (btn.getAttribute('data-bg') === timerState.bg) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
-        });
+        // Background styles sync is omitted as display is unified to black
 
         document.querySelectorAll('.color-dot').forEach(btn => {
             if (btn.getAttribute('data-color') === timerState.digitColor) {

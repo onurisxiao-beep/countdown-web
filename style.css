@@ -183,7 +183,7 @@ body {
     justify-content: center;
     align-items: center;
     overflow: hidden;
-    background-size: 200% 200%;
+    background-color: #000000 !important; /* Unified strictly to black background */
     transition: background 0.8s ease;
 }
 
@@ -215,11 +215,23 @@ body {
 }
 
 /* Timer Digits Color Mappings */
-.digits-neon_amber { color: var(--neon-amber); text-shadow: 0 0 25px rgba(255, 179, 0, 0.6); }
-.digits-neon_pink { color: var(--neon-pink); text-shadow: 0 0 25px rgba(255, 42, 109, 0.6); }
-.digits-neon_blue { color: var(--neon-blue); text-shadow: 0 0 25px rgba(5, 217, 232, 0.6); }
-.digits-neon_green { color: var(--neon-green); text-shadow: 0 0 25px rgba(0, 245, 212, 0.6); }
-.digits-white { color: var(--neon-white); text-shadow: 0 0 20px rgba(255, 255, 255, 0.4); }
+.digits-white { color: #FFFFFF; text-shadow: 0 0 20px rgba(255, 255, 255, 0.4); }
+.digits-yellow { color: #FFD700; text-shadow: 0 0 25px rgba(255, 215, 0, 0.5); }
+.digits-red { color: #FF0000; text-shadow: 0 0 25px rgba(255, 0, 0, 0.6); }
+
+/* Blinking Critical Alert Animation */
+@keyframes blinkRed {
+    0%, 100% { color: #FF0000; text-shadow: 0 0 30px rgba(255, 0, 0, 0.8); }
+    50% { color: #220000; text-shadow: none; }
+}
+.digits-flash-red {
+    animation: blinkRed 0.8s steps(1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.7; }
+}
 
 /* Collapsible Connection Card */
 .glass-card {
@@ -604,11 +616,9 @@ button:active {
     box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
 }
 
-.color-dot.color-amber { background-color: var(--neon-amber); }
-.color-dot.color-pink { background-color: var(--neon-pink); }
-.color-dot.color-blue { background-color: var(--neon-blue); }
-.color-dot.color-green { background-color: var(--neon-green); }
-.color-dot.color-white { background-color: var(--neon-white); }
+.color-dot.color-white { background-color: #FFFFFF; }
+.color-dot.color-yellow { background-color: #FFD700; }
+.color-dot.color-red { background-color: #FF0000; }
 
 /* Fonts Selection Column */
 .font-column {
