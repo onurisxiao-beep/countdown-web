@@ -238,10 +238,14 @@ function handleIncomingCommand(data) {
                 break;
         }
     } 
-    else if (data.style) {
-        if (data.style.bg) timerState.bg = data.style.bg;
-        if (data.style.color) timerState.digitColor = data.style.color;
-        if (data.style.font) timerState.font = data.style.font;
+    else if (data.type === 'style' || data.style) {
+        const bgVal = data.bg || (data.style && data.style.bg);
+        const colorVal = data.color || (data.style && data.style.color);
+        const fontVal = data.font || (data.style && data.style.font);
+        
+        if (bgVal) timerState.bg = bgVal;
+        if (colorVal) timerState.digitColor = colorVal;
+        if (fontVal) timerState.font = fontVal;
     }
     
     // Broadcast updated state immediately
@@ -277,12 +281,10 @@ function renderUI() {
         // Background style is strictly unified to black in CSS, but class keeps Display active
         document.getElementById('display-screen').className = `screen active screen-bg-dark`;
 
-        // Font and dynamic Color mapping based on remaining time
+        // Font and dynamic Color mapping based on remaining time (flashing red under 60s)
         let colorClass = `digits-${timerState.digitColor}`;
-        if (timerState.timeLeft <= 10) {
+        if (timerState.timeLeft <= 60) {
             colorClass = 'digits-flash-red';
-        } else if (timerState.timeLeft <= 60) {
-            colorClass = 'digits-red';
         }
         timerText.className = `timer-digits digits-${timerState.font} ${colorClass}`;
 
@@ -295,12 +297,10 @@ function renderUI() {
         const ctrlTimerText = document.getElementById('ctrl-timer-text');
         ctrlTimerText.textContent = formatted;
         
-        // Sync preview color warning in real-time with Display
+        // Sync preview color warning in real-time with Display (flashing red under 60s)
         let ctrlColorClass = `digits-${timerState.digitColor}`;
-        if (timerState.timeLeft <= 10) {
+        if (timerState.timeLeft <= 60) {
             ctrlColorClass = 'digits-flash-red';
-        } else if (timerState.timeLeft <= 60) {
-            ctrlColorClass = 'digits-red';
         }
         ctrlTimerText.className = `timer-preview-val digits-${timerState.font} ${ctrlColorClass}`;
 
