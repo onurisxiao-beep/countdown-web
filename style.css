@@ -191,27 +191,14 @@ body {
     font-size: min(35vw, 65vh);
     font-weight: 700;
     line-height: 1;
-    letter-spacing: -2px;
+    letter-spacing: 2px;
     text-align: center;
     text-shadow: 0 12px 30px rgba(0,0,0,0.5);
     font-variant-numeric: tabular-nums;
     user-select: none;
-    transition: color 0.5s ease, font-family 0.5s ease;
+    transition: color 0.5s ease;
     z-index: 1;
-}
-
-/* Timer Digits Font Mappings */
-.digits-digital {
     font-family: 'ShareTechMono', monospace, Courier;
-    letter-spacing: 2px;
-}
-
-.digits-serif {
-    font-family: Georgia, 'Playfair Display', serif;
-}
-
-.digits-sans {
-    font-family: system-ui, -apple-system, sans-serif;
 }
 
 /* Timer Digits Color Mappings */
@@ -436,7 +423,7 @@ body {
     text-shadow: 0 0 15px rgba(5, 217, 232, 0.4);
     font-variant-numeric: tabular-nums;
     margin-bottom: 6px;
-    font-family: monospace;
+    font-family: 'ShareTechMono', monospace, Courier;
 }
 
 .badge {

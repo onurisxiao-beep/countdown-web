@@ -8,12 +8,12 @@ let isHost = false; // Display Mode = Host, Controller Mode = Client
 
 // Centralized state (maintained by Host, synced by Controller)
 let timerState = {
-    timeLeft: 300,
-    totalTime: 300,
+    timeLeft: 1200, // Default to 20 minutes (1200 seconds)
+    totalTime: 1200,
     isRunning: false,
     bg: "dark",
-    digitColor: "white", // Default to white
-    font: "sans"
+    digitColor: "white", // Starting color is strictly white
+    font: "digital" // Using premium digital font by default
 };
 
 let tickerInterval = null;
@@ -281,12 +281,14 @@ function renderUI() {
         // Background style is strictly unified to black in CSS, but class keeps Display active
         document.getElementById('display-screen').className = `screen active screen-bg-dark`;
 
-        // Font and dynamic Color mapping based on remaining time (flashing red under 60s)
-        let colorClass = `digits-${timerState.digitColor}`;
+        // Three-stage dynamic color mapping based on remaining time
+        let colorClass = 'digits-white';
         if (timerState.timeLeft <= 60) {
-            colorClass = 'digits-flash-red';
+            colorClass = 'digits-flash-red'; // Flashing Red under 1 min (60s)
+        } else if (timerState.timeLeft <= 300) {
+            colorClass = 'digits-yellow'; // Yellow under 5 min (300s)
         }
-        timerText.className = `timer-digits digits-${timerState.font} ${colorClass}`;
+        timerText.className = `timer-digits ${colorClass}`;
 
         // Bottom Bar play button
         document.getElementById('btn-disp-play').textContent = timerState.isRunning ? '⏸' : '▶';
@@ -297,12 +299,14 @@ function renderUI() {
         const ctrlTimerText = document.getElementById('ctrl-timer-text');
         ctrlTimerText.textContent = formatted;
         
-        // Sync preview color warning in real-time with Display (flashing red under 60s)
-        let ctrlColorClass = `digits-${timerState.digitColor}`;
+        // Sync preview color warning in real-time with Display
+        let ctrlColorClass = 'digits-white';
         if (timerState.timeLeft <= 60) {
-            ctrlColorClass = 'digits-flash-red';
+            ctrlColorClass = 'digits-flash-red'; // Flashing Red under 1 min (60s)
+        } else if (timerState.timeLeft <= 300) {
+            ctrlColorClass = 'digits-yellow'; // Yellow under 5 min (300s)
         }
-        ctrlTimerText.className = `timer-preview-val digits-${timerState.font} ${ctrlColorClass}`;
+        ctrlTimerText.className = `timer-preview-val ${ctrlColorClass}`;
 
         // Status badge
         const badge = document.getElementById('ctrl-state-badge');
@@ -441,39 +445,22 @@ document.getElementById('btn-ctrl-add1').onclick = () => {
     sendCommand({ type: 'control', action: 'adjust', value: 60 });
 };
 
-// Presets
+// Presets only update local picker values on the phone, NOT immediately sending to Display!
 document.querySelectorAll('.btn-preset').forEach(btn => {
     btn.onclick = () => {
-        const secs = btn.getAttribute('data-seconds');
-        sendCommand({ type: 'control', action: 'set', value: secs });
+        const secs = parseInt(btn.getAttribute('data-seconds')) || 0;
+        const mins = Math.floor(secs / 60);
+        const remainingSecs = secs % 60;
+        
+        // Update local picker select elements
+        minSelect.value = mins;
+        secSelect.value = remainingSecs;
     };
 });
 
-// Custom apply
+// Custom apply (the ONLY button that pushes set time command to Display!)
 document.getElementById('btn-apply-custom').onclick = () => {
     const m = parseInt(minSelect.value) || 0;
     const s = parseInt(secSelect.value) || 0;
     sendCommand({ type: 'control', action: 'set', value: m * 60 + s });
 };
-
-// Bind Style clicks
-document.querySelectorAll('.bg-selector-grid .style-item').forEach(btn => {
-    btn.onclick = () => {
-        const bgVal = btn.getAttribute('data-bg');
-        sendCommand({ type: 'style', bg: bgVal });
-    };
-});
-
-document.querySelectorAll('.color-dot').forEach(btn => {
-    btn.onclick = () => {
-        const colorVal = btn.getAttribute('data-color');
-        sendCommand({ type: 'style', color: colorVal });
-    };
-});
-
-document.querySelectorAll('.font-item').forEach(btn => {
-    btn.onclick = () => {
-        const fontVal = btn.getAttribute('data-font');
-        sendCommand({ type: 'style', font: fontVal });
-    };
-});

@@ -101,7 +101,7 @@
 
             <!-- Presets & Picker -->
             <div class="card">
-                <h4 class="card-title">設定時間</h4>
+                <h4 class="card-title">設定時間 (須點選「套用」送出)</h4>
                 
                 <div class="presets-grid">
                     <button class="btn-preset" data-seconds="60">1分</button>
@@ -123,30 +123,13 @@
                     <span class="picker-unit">秒</span>
                     <button id="btn-apply-custom" class="btn-apply">套用</button>
                 </div>
-            </div>
 
-            <!-- Digit Colors -->
-            <div class="card">
-                <h4 class="card-title">選擇起始數字顏色</h4>
-                <div class="color-grid" style="justify-content: space-around;">
-                    <button class="color-dot color-white" data-color="white" title="白色" style="width: 50px; height: 50px;"></button>
-                    <button class="color-dot color-yellow" data-color="yellow" title="黃色" style="width: 50px; height: 50px;"></button>
-                    <button class="color-dot color-red" data-color="red" title="紅色" style="width: 50px; height: 50px;"></button>
-                </div>
-                <div class="alert-info-text" style="font-size: 11px; color: var(--text-sub); margin-top: 14px; text-align: center; line-height: 1.4;">
-                    💡 <strong style="color: var(--neon-pink)">提示：</strong>顯示器統一為黑底。<br>
-                    倒數剩下 <span style="color: #FF4444; font-weight: bold;">60 秒</span>內，數字將自動變為<span style="color: #FF4444; font-weight: bold;">紅色</span>；<br>
-                    剩下 <span style="color: #FF2A6D; font-weight: bold;">10 秒</span>內會進入<span style="color: #FF2A6D; font-weight: bold; animation: pulse 1s infinite;">紅色閃爍</span>警示狀態！
-                </div>
-            </div>
-
-            <!-- Fonts -->
-            <div class="card">
-                <h4 class="card-title">更換字型</h4>
-                <div class="font-column">
-                    <button class="font-item font-digital" data-font="digital">DIGITAL 數位電子</button>
-                    <button class="font-item font-serif" data-font="serif">SERIF 典雅襯線</button>
-                    <button class="font-item font-sans" data-font="sans">SANS 幾何現代</button>
+                <div class="alert-info-text" style="font-size: 11px; color: var(--text-sub); margin-top: 14px; text-align: left; line-height: 1.5; padding: 12px; background: rgba(0,0,0,0.25); border-radius: 8px; border: 1px solid rgba(255,255,255,0.03);">
+                    💡 <strong style="color: var(--primary)">三階段智慧變色警示：</strong><br>
+                    • 剩餘時間 &gt; <span style="color: #FFF; font-weight: bold;">5分鐘</span>：顯示為<span style="color: #FFF; font-weight: bold;">白色</span> (起始顏色)<br>
+                    • 剩餘時間 ≦ <span style="color: #FFD700; font-weight: bold;">5分鐘 (300秒)</span>：自動轉為<span style="color: #FFD700; font-weight: bold;">黃色</span><br>
+                    • 剩餘時間 ≦ <span style="color: #FF2A6D; font-weight: bold;">1分鐘 (60秒)</span>：自動變為<span style="color: #FF2A6D; font-weight: bold; animation: pulse 0.8s infinite;">紅色呼吸閃爍</span>！<br>
+                    <span style="display: block; margin-top: 6px; font-size: 10px; color: var(--text-sub); font-style: italic;">※ 顯示器背景統一為高對比純黑色。</span>
                 </div>
             </div>
         </div>
