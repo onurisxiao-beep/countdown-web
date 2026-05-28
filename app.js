@@ -63,6 +63,7 @@ document.getElementById('btn-select-display').onclick = () => {
     initDisplayScreen();
     initMqttConnection();
     startHostTicker();
+    renderUI();
 };
 
 document.getElementById('btn-select-controller').onclick = () => {
@@ -73,6 +74,7 @@ document.getElementById('btn-select-controller').onclick = () => {
         roomId = roomInput.trim();
         showScreen('controller');
         initMqttConnection();
+        renderUI();
     } else {
         showScreen('lobby');
     }
@@ -289,7 +291,9 @@ function renderUI() {
         } else if (timerState.timeLeft <= 300) {
             colorClass = 'digits-yellow'; // Yellow under 5 min (300s)
         }
-        timerText.className = `timer-digits ${colorClass}`;
+        const fontClass = timerState.font === 'sans' ? 'font-sans' : 'font-digital';
+        timerText.className = `timer-digits ${colorClass} ${fontClass}`;
+        timerText.style.fontFamily = timerState.font === 'sans' ? 'sans-serif' : "'ShareTechMono', Courier, monospace";
 
         // Bottom Bar play button
         document.getElementById('btn-disp-play').textContent = timerState.isRunning ? '⏸' : '▶';
@@ -307,7 +311,9 @@ function renderUI() {
         } else if (timerState.timeLeft <= 300) {
             ctrlColorClass = 'digits-yellow'; // Yellow under 5 min (300s)
         }
-        ctrlTimerText.className = `timer-preview-val ${ctrlColorClass}`;
+        const ctrlFontClass = timerState.font === 'sans' ? 'font-sans' : 'font-digital';
+        ctrlTimerText.className = `timer-preview-val ${ctrlColorClass} ${ctrlFontClass}`;
+        ctrlTimerText.style.fontFamily = timerState.font === 'sans' ? 'sans-serif' : "'ShareTechMono', Courier, monospace";
 
         // Status badge
         const badge = document.getElementById('ctrl-state-badge');
@@ -419,7 +425,7 @@ for (let i = 0; i <= 120; i++) {
     const opt = document.createElement('option');
     opt.value = i;
     opt.textContent = i.toString().padStart(2, '0');
-    if (i === 5) opt.selected = true;
+    if (i === 20) opt.selected = true;
     minSelect.appendChild(opt);
 }
 
@@ -469,3 +475,11 @@ document.getElementById('btn-apply-custom').onclick = () => {
     const s = parseInt(secSelect.value) || 0;
     sendCommand({ type: 'control', action: 'set', value: m * 60 + s });
 };
+
+// Bind font selector clicks
+document.querySelectorAll('.font-item').forEach(btn => {
+    btn.onclick = () => {
+        const fontVal = btn.getAttribute('data-font');
+        sendCommand({ type: 'style', font: fontVal });
+    };
+});
