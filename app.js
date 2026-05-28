@@ -57,7 +57,8 @@ function showScreen(screenName) {
 // Bind Lobby Buttons
 document.getElementById('btn-select-display').onclick = () => {
     isHost = true;
-    roomId = 'taipower_' + Math.floor(Math.random() * 1000000).toString(16);
+    // Generate a strictly 6-digit numeric room ID (e.g., 284915)
+    roomId = Math.floor(100000 + Math.random() * 900000).toString();
     showScreen('display');
     initDisplayScreen();
     initMqttConnection();
@@ -360,12 +361,16 @@ function initDisplayScreen() {
         connectionUrl = `https://onurisxiao-beep.github.io/countdown-web/?room=${roomId}`;
         document.getElementById('connection-url').innerHTML = `
             <div style="font-size:11px;color:#FF2A6D;margin-bottom:6px">⚠️ 您正以本地檔案開啟</div>
-            <a href="${connectionUrl}" target="_blank" style="color:var(--primary);text-decoration:none">${connectionUrl}</a>
+            <div style="font-size:16px;color:white;margin-bottom:8px">房間號碼 (Room ID)：<strong style="color:var(--primary);font-size:20px;letter-spacing:1px">${roomId}</strong></div>
+            <a href="${connectionUrl}" target="_blank" style="color:var(--primary);text-decoration:none;font-size:11px">${connectionUrl}</a>
         `;
     } else {
         // Standard HTTP / HTTPS protocol (Local server or Github Pages)
         connectionUrl = `${window.location.origin}${window.location.pathname}?room=${roomId}`;
-        document.getElementById('connection-url').textContent = connectionUrl;
+        document.getElementById('connection-url').innerHTML = `
+            <div style="font-size:16px;color:white;margin-bottom:8px">房間號碼 (Room ID)：<strong style="color:var(--primary);font-size:20px;letter-spacing:1px">${roomId}</strong></div>
+            <span style="font-size:11px;color:var(--text-sub);word-break:break-all">${connectionUrl}</span>
+        `;
     }
     
     // Draw client-side QR Code onto canvas using QRCode library
